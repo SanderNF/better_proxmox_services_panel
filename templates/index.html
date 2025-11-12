@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Palworld Web Panel</title>
+</head>
+<body>
+
+    <h2>Announcement</h2>
+    <form action="/announce" method="POST">
+        <label for="msg">Announcement:</label>
+        <input type="text" name="msg" id="">
+
+        <button type="submit">Send announcement</button>
+    </form>
+    <br>
+
+    <h2>Save</h2>
+    <form action="/save" method="POST">
+        <button type="submit">Save</button>
+    </form>
+    <br>
+
+    <h2>Metrics</h2>
+    <button onclick="getMetrics()">get metrics</button>
+    <p id="metrics"></p>
+    <br>
+
+    <h2>Players</h2>
+    <button onclick="getPlayers()">get players</button>
+    <p id="players"></p>
+
+
+
+    <script>
+        function getMetrics() {
+            fetch('/metrics', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(async res => {
+                const data = await res.json().catch(() => ({}));
+                if (res.ok) {
+                    console.log('GET metrics sucsses:', data)
+                    const metrics = `uptime: ${data.uptime} \n players: ${data.players}/${data.maxPlayers} \n ingame days elapsed: ${data.ingameDays} \n server FPS: ${data.serverFps} \n server frame time: ${data.serverFrameTime}`
+                    document.getElementById('metrics').innerText = metrics
+                }
+                else console.error('Metrics error:', res.status, data);
+            })
+            .catch(err => console.error('Fetch error:', err));
+        }
+        function getPlayers() {
+            fetch('/players', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(async res => {
+                const data = await res.json().catch(() => ({}));
+                if (res.ok) {
+                    console.log('GET players sucsses:', data)
+                    playerList = ""
+                    for (let i = 0; i < data.length; i++) {
+                        const element = data[i];
+                        playerList += `Name: ${element.name} \n Account Name: ${element.accountName} \n Ping: ${element.ping} \n Level: ${element.level} \n x: ${element.x} \n y: ${element.y} \n \n`
+                    }
+                    const metrics = JSON.stringify(data)
+                    document.getElementById('players').innerText = playerList
+                }
+                else console.error('Metrics error:', res.status, data);
+            })
+            .catch(err => console.error('Fetch error:', err));
+        }
+        setInterval(getMetrics, 5000)
+        setInterval(getPlayers, 5000)
+        getMetrics()
+        getPlayers()
+    </script>
+</body>
+    </html>
