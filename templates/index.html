@@ -8,36 +8,62 @@
 </head>
 <body>
     <h1 style="text-align: center;">Palworld Web Panel</h1>
-    <div class="col1">
-        <div>
-            <h2>Send Announcement</h2>
-            <form action="/announce" method="POST">
-                <textarea name="msg" id="">I've come to make an announcement: Shadow the Hedgehog's a bitch-ass motherfucker</textarea>
-                <button type="submit"><h3>Send announcement</h3></button>
-            </form>
-        </div>
+    <div class="row1">
+        <div class="col1">
+            <div>
+                <h2>Send Announcement</h2>
+                <textarea name="msg" id="announce">I've come to make an announcement: Shadow the Hedgehog's a bitch-ass motherfucker</textarea>
+                <button onclick="announce()"><h3>Send announcement</h3></button>
+                <!--
+                <form action="/announce" method="POST">
+                    <textarea name="msg" id="">I've come to make an announcement: Shadow the Hedgehog's a bitch-ass motherfucker</textarea>
+                    <button type="submit"><h3>Send announcement</h3></button>
+                </form>
+                -->
+            </div>
 
-        <div>
-            <h2>Save Server</h2>
-            <form action="/save" method="POST">
-                <button type="submit"><h3>Save</h3></button>
-            </form>
-        </div>
+            <div>
+                <h2>Save Server</h2>
+                <button onclick="save()"><h3>Save</h3></button>
+                <!--
+                <form action="/save" method="POST">
+                    <button type="submit"><h3>Save</h3></button>
+                </form>
+                -->
+            </div>
 
-        <div>
-        <h2>Metrics</h2>
-        <p id="metrics"></p>
+            <div>
+            <h2>Metrics</h2>
+            <p id="metrics"></p>
+            </div>
         </div>
-    </div>
-    <div class="col2">
-        <div>
-        <h2>Players</h2>
-        <p id="players"></p>
+        <div class="col2">
+            <div>
+            <h2>Players</h2>
+            <p id="players"></p>
+            </div>
         </div>
     </div>
 
 
     <script>
+        function save() {
+            fetch('/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+        }
+        function announce() {
+            let formData = new FormData();
+            const announcement = document.getElementById('announce').value
+            formData.append('msg', announcement);
+            fetch('/announce', {
+                method: 'POST',
+                body: formData,
+            })
+        }
         function getMetrics() {
             fetch('/metrics', {
                 method: 'GET',
