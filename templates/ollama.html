@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="{{ url_for('static', filename='ollama.css') }}" rel="stylesheet">
+    <script type="module">
+        import markdownIt from 'https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/+esm'
+        window.markdownIt = markdownIt
+    </script>
+    <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+
+</head>
+<body>
+    
+    <div id="responses">
+        <p id="newResponse" style="display: none;"></p>
+    </div>
+    <div class="inputs">
+        <textarea name="msg" id="input">I've come to make an announcement: Shadow the Hedgehog's a bitch-ass motherfucker</textarea>
+        <div style="display: flex; flex-direction: column; justify-content: space-evenly;">
+            <button onclick="generate()">Send prompt with generate</button>
+            <button onclick="chat()">Send prompt with chat</button>
+        </div>
+    </div>
+
+    <script>
+        async function generate() {
+            const prompt = document.getElementById('input').value
+            let promptP = document.createElement('p')
+            promptP.id = 'prompt'
+            promptP.innerText = prompt
+            document.getElementById('responses').appendChild(promptP)
+            document.getElementById('newResponse').id = "Response"
+            let p = document.createElement('p')
+            p.id = 'newResponse'
+            document.getElementById('responses').appendChild(p)
+            let Element = document.getElementById('newResponse')
+            Element.innerHTML = ""
+            Element.innerText = ""
+            let StreamedResponse = ""
+            const data = {
+                model: 'qwen3-coder:30b',
+                prompt: prompt
+            }
+            const md = window.markdownIt({
+                html: true,
+                linkify: true,
+                typographer: true,
+            })
+            for await (const chunk of (await fetch('/ollama/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+
+                },
+                body: JSON.stringify(data)
+            })).body) {
+                const data = new TextDecoder().decode(chunk)
+                const data2 = JSON.parse(data)
+                //console.log('got', data);
+                console.log('and', data2);
+                //console.log("from", chunk);
+                StreamedResponse += data2.response
+                console.log(StreamedResponse)
+                Element.innerHTML = md.render(StreamedResponse)
+                let codeblocks = Element.querySelectorAll('pre')
+                for (let index = 0; index < codeblocks.length; index++) {
+                    const element = codeblocks[index];
+                    element.classList.add("prettyprint")
+                }
+                PR.prettyPrint();
+                
+            }
+            
+        }
+        async function chat() {
+            const prompt = document.getElementById('input').value
+            let promptP = document.createElement('p')
+            promptP.id = 'prompt'
+            promptP.innerText = prompt
+            document.getElementById('responses').appendChild(promptP)
+            try {
+                document.getElementById('newResponse').id = "Response"
+            } catch {}
+            let p = document.createElement('p')
+            p.id = 'newResponse'
+            document.getElementById('responses').appendChild(p)
+            try {
+                document.getElementById('newResponseHistory').id = "ResponseHistory"
+            } catch {}
+            let p2 = document.createElement('p')
+            p2.id = 'newResponseHistory'
+            p2.classList.add('hide')
+            document.getElementById('responses').appendChild(p2)
+            
+            let Element = document.getElementById('newResponse')
+            let Element2 = document.getElementById('newResponseHistory')
+            Element.innerHTML = ""
+            Element.innerText = ""
+            let StreamedResponse = ""
+            let messages = []
+            let history = document.querySelectorAll('#ResponseHistory, #newResponseHistory, #prompt')
+            for (let i = 0; i < history.length; i++) {
+                const element = history[i];
+                console.log(element.id)
+                if (element.id === 'prompt') {
+                    console.log('prompt')
+                    messages.push({role: "user", content: element.innerText})
+                } else {
+                    console.log('response')
+                    messages.push({role: "assistant", content: element.innerText})
+                }
+            }
+            console.log(messages)
+            const data = {
+                model: 'qwen3-coder:30b',
+                messages: messages
+            }
+            const md = window.markdownIt({
+                html: true,
+                linkify: true,
+                typographer: true,
+            })
+            for await (const chunk of (await fetch('/ollama/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+
+                },
+                body: JSON.stringify(data)
+            })).body) {
+                const data = new TextDecoder().decode(chunk)
+                const data2 = JSON.parse(data)
+                //console.log('got', data);
+                //console.log('and', data2);
+                //console.log("from", chunk);
+                StreamedResponse += data2.message.content
+                //console.log(StreamedResponse)
+                Element.innerHTML = md.render(StreamedResponse)
+                Element2.innerText = StreamedResponse
+                let codeblocks = Element.querySelectorAll('pre')
+                for (let index = 0; index < codeblocks.length; index++) {
+                    const element = codeblocks[index];
+                    element.classList.add("prettyprint")
+                }
+                PR.prettyPrint();
+                
+            }
+            
+        }
+    </script>
+</body>
+</html>

@@ -6,11 +6,11 @@ app = Flask(__name__)
 url = "http://192.168.86.128:8212/v1/api"
 
 
-@app.route('/')
-def indexHtml():
-    return render_template('index.html')
+@app.route('/palworld/')
+def palworldHtml():
+    return render_template('palworld.html')
 
-@app.route('/announce', methods=['POST'])
+@app.route('/palworld/announce', methods=['POST'])
 def announce():
     msg = request.form['msg'] # 'navn' = name på inputen i HTML
     print(msg)
@@ -24,7 +24,7 @@ def announce():
     response = requests.request("POST", f'{url}/announce', headers=headers, data=payload)
     return redirect('/')
 
-@app.route('/save', methods=['POST'])
+@app.route('/palworld/save', methods=['POST'])
 def save():
     payload={}
     headers = {
@@ -34,7 +34,7 @@ def save():
     response = requests.request("POST", f'{url}/save', headers=headers, data=payload)
     return redirect('/')
 
-@app.route('/metrics', methods=['GET'])
+@app.route('/palworld/metrics', methods=['GET'])
 def metrics():
     payload={}
     headers = {
@@ -61,7 +61,7 @@ def metrics():
         "ingameDays": res["days"],
     })
     
-@app.route('/players', methods=['GET'])
+@app.route('/palworld/players', methods=['GET'])
 def players():
     payload={}
     headers = {

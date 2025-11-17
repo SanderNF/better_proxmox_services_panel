@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Palworld Web Panel</title>
-    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='palworld.css') }}" rel="stylesheet">
 </head>
 <body>
     <h1 style="text-align: center;">Palworld Web Panel</h1>
@@ -48,7 +48,7 @@
 
     <script>
         function save() {
-            fetch('/save', {
+            fetch('/palworld/save', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -59,13 +59,13 @@
             let formData = new FormData();
             const announcement = document.getElementById('announce').value
             formData.append('msg', announcement);
-            fetch('/announce', {
+            fetch('/palworld/announce', {
                 method: 'POST',
                 body: formData,
             })
         }
         function getMetrics() {
-            fetch('/metrics', {
+            fetch('/palworld/metrics', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'
@@ -83,7 +83,7 @@
             .catch(err => console.error('Fetch error:', err));
         }
         function getPlayers() {
-            fetch('/players', {
+            fetch('/palworld/players', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'
