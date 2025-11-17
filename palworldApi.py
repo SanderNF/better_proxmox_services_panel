@@ -13,6 +13,7 @@ def indexHtml():
 @app.route('/announce', methods=['POST'])
 def announce():
     msg = request.form['msg'] # 'navn' = name på inputen i HTML
+    print(msg)
     headers = {
         'Content-Type': 'application/json',
         'authorization': 'Basic YWRtaW46Ynl0ZXMxMjM='
@@ -56,7 +57,7 @@ def metrics():
         "players": res["currentplayernum"],
         "maxPlayers": res["maxplayernum"],
         "serverFps": res["serverfps"],
-        "serverFrameTime": res["serverframetime"],
+        "serverFrameTime": '{0:.2f}'.format(res["serverframetime"]),
         "ingameDays": res["days"],
     })
     

@@ -4,33 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Palworld Web Panel</title>
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
 </head>
 <body>
+    <h1 style="text-align: center;">Palworld Web Panel</h1>
+    <div class="col1">
+        <div>
+            <h2>Send Announcement</h2>
+            <form action="/announce" method="POST">
+                <textarea name="msg" id="">I've come to make an announcement: Shadow the Hedgehog's a bitch-ass motherfucker</textarea>
+                <button type="submit"><h3>Send announcement</h3></button>
+            </form>
+        </div>
 
-    <h2>Announcement</h2>
-    <form action="/announce" method="POST">
-        <label for="msg">Announcement:</label>
-        <input type="text" name="msg" id="">
+        <div>
+            <h2>Save Server</h2>
+            <form action="/save" method="POST">
+                <button type="submit"><h3>Save</h3></button>
+            </form>
+        </div>
 
-        <button type="submit">Send announcement</button>
-    </form>
-    <br>
-
-    <h2>Save</h2>
-    <form action="/save" method="POST">
-        <button type="submit">Save</button>
-    </form>
-    <br>
-
-    <h2>Metrics</h2>
-    <button onclick="getMetrics()">get metrics</button>
-    <p id="metrics"></p>
-    <br>
-
-    <h2>Players</h2>
-    <button onclick="getPlayers()">get players</button>
-    <p id="players"></p>
-
+        <div>
+        <h2>Metrics</h2>
+        <p id="metrics"></p>
+        </div>
+    </div>
+    <div class="col2">
+        <div>
+        <h2>Players</h2>
+        <p id="players"></p>
+        </div>
+    </div>
 
 
     <script>
@@ -44,7 +48,7 @@
             .then(async res => {
                 const data = await res.json().catch(() => ({}));
                 if (res.ok) {
-                    console.log('GET metrics sucsses:', data)
+                    //console.log('GET metrics sucsses:', data)
                     const metrics = `uptime: ${data.uptime} \n players: ${data.players}/${data.maxPlayers} \n ingame days elapsed: ${data.ingameDays} \n server FPS: ${data.serverFps} \n server frame time: ${data.serverFrameTime}`
                     document.getElementById('metrics').innerText = metrics
                 }
@@ -62,8 +66,12 @@
             .then(async res => {
                 const data = await res.json().catch(() => ({}));
                 if (res.ok) {
-                    console.log('GET players sucsses:', data)
+                    //console.log('GET players sucsses:', data)
                     playerList = ""
+                    if (data.length === 0) {
+                        document.getElementById('players').innerText = "No players online"
+                        return
+                    }
                     for (let i = 0; i < data.length; i++) {
                         const element = data[i];
                         playerList += `Name: ${element.name} \n Account Name: ${element.accountName} \n Ping: ${element.ping} \n Level: ${element.level} \n x: ${element.x} \n y: ${element.y} \n \n`
